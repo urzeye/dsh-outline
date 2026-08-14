@@ -19,7 +19,7 @@ import {
   loadBookmarks, loadExpandLevel, saveBookmarks, saveExpandLevel, type ChromeStore,
 } from '../store.ts'
 import {
-  CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, OutlineGlyph,
+  CheckGlyph, CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, OutlineGlyph,
   OutlineRow, PinGlyph, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
 } from './parts.tsx'
 import css from './panel.module.css'
@@ -169,6 +169,11 @@ export function OutlinePanel(props: OutlinePanelProps) {
     if (root !== null) scrollToItem(root, node)
   }
 
+  // 复制成功反馈：图标变对号 2 秒后恢复（复用字典里的 action.copied）
+  const [copied, setCopied] = useState(false)
+  const copiedTimer = useRef(0)
+  useEffect(() => () => window.clearTimeout(copiedTimer.current), [])
+
   const onCopy = (): void => {
     if (state === undefined) return
     const lines: string[] = []
@@ -183,6 +188,9 @@ export function OutlinePanel(props: OutlinePanelProps) {
     }
     walk(state.tree)
     void navigator.clipboard?.writeText(lines.join('\n'))
+    window.clearTimeout(copiedTimer.current)
+    setCopied(true)
+    copiedTimer.current = window.setTimeout(() => setCopied(false), 2000)
   }
 
   const panelStyle = chrome.left !== null && chrome.top !== null
@@ -247,12 +255,12 @@ export function OutlinePanel(props: OutlinePanelProps) {
         </button>
         <button
           type="button"
-          className={css.iconBtn}
-          title={t('action.copy')}
-          aria-label={t('action.copy')}
+          className={copied ? `${css.iconBtn} ${css.iconBtnCopied}` : css.iconBtn}
+          title={copied ? t('action.copied') : t('action.copy')}
+          aria-label={copied ? t('action.copied') : t('action.copy')}
           onClick={onCopy}
         >
-          <CopyGlyph />
+          {copied ? <CheckGlyph /> : <CopyGlyph />}
         </button>
         <div className={css.searchBox}>
           <span className={css.searchIcon}><SearchGlyph /></span>
