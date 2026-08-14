@@ -1,5 +1,7 @@
 # dsh-outline
 
+![dsh-outline Demo](./docs/media/demo.gif)
+
 DeepSeek Harness（DSH）Web GUI 的**实时大纲插件**：在会话页面提供"用户问题 + Markdown 标题（1~6 级）"的大纲树面板。
 
 - 流式生成时实时更新，点击节点滚动定位并高亮当前阅读位置
@@ -7,7 +9,7 @@ DeepSeek Harness（DSH）Web GUI 的**实时大纲插件**：在会话页面提�
 - 搜索、按会话收藏、跟随 DSH 主题与中英文语言
 - 面板为 `shell.overlay` 浮层：可拖拽移动、可最小化、不挤压聊天区
 
-交互形态移植自 Ophel（浏览器扩展）；插件形态遵循 DSH 官方[打包与安装约定](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/user/develop/basic/publish.zh.md)，参考 [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)。
+交互形态移植自 [Ophel](https://github.com/urzeye/ophel)（浏览器扩展）；插件形态遵循 DSH 官方[打包与安装约定](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/user/develop/basic/publish.zh.md)，参考 DSH-better-sidebar。
 
 ## 安装
 
