@@ -5,7 +5,8 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  max-height: min(560px, calc(100vh - 200px));
+  /* 固定高度：大纲随流式增长时面板不弹跳，peek/pin 都是稳定目标 */
+  height: min(560px, calc(100vh - 200px));
   pointer-events: auto;
   background: var(--dsw-alias-bg-layer-1, #fff);
   border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.08));

@@ -128,7 +128,9 @@ export function OutlinePanel(props: OutlinePanelProps) {
     }
   }, [visible, state, sessionId])
 
-  // 标题栏拖拽（clamp 在视口内，松手时持久化）
+  // 标题栏拖拽（4px 移动阈值，clamp 在视口内，拖动后松手才持久化并固定）。
+  // 阈值是必须的：pin/关闭按钮也在标题栏里，没有阈值时 pointerup 会把
+  // pinned 置 true，随后的 click 再取反，两次写入抵消（点击 pin 无响应）。
   const panelRef = useRef<HTMLDivElement | null>(null)
   const onDragStart = useCallback((e: React.PointerEvent) => {
     if (e.button !== 0) return
@@ -137,7 +139,12 @@ export function OutlinePanel(props: OutlinePanelProps) {
     const rect = panel.getBoundingClientRect()
     const dx = e.clientX - rect.left
     const dy = e.clientY - rect.top
+    const startX = e.clientX
+    const startY = e.clientY
+    let moved = false
     const onMove = (ev: PointerEvent): void => {
+      if (!moved && Math.abs(ev.clientX - startX) < 4 && Math.abs(ev.clientY - startY) < 4) return
+      moved = true
       panel.style.left = `${Math.max(0, Math.min(window.innerWidth - rect.width, ev.clientX - dx))}px`
       panel.style.top = `${Math.max(0, Math.min(window.innerHeight - 80, ev.clientY - dy))}px`
       panel.style.right = 'auto'
@@ -145,6 +152,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
     const onUp = (ev: PointerEvent): void => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
+      if (!moved) return
       // 拖拽即视为固定意图：位置持久化的同时把面板钉住
       store.set({
         left: Math.max(0, Math.min(window.innerWidth - rect.width, ev.clientX - dx)),
@@ -155,23 +163,6 @@ export function OutlinePanel(props: OutlinePanelProps) {
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
   }, [store])
-
-  // 未固定且未悬浮时只剩右缘触发条；点击触发条 = 直接固定
-  if (!visible) {
-    return (
-      <button
-        type="button"
-        className={css.edgeTrigger}
-        title={t('panel.open')}
-        aria-label={t('panel.open')}
-        onPointerEnter={onHoverEnter}
-        onPointerLeave={onHoverLeave}
-        onClick={() => store.set({ pinned: true })}
-      >
-        <OutlineGlyph />
-      </button>
-    )
-  }
 
   const onItemClick = (node: OutlineNode): void => {
     const root = findChatRoot()
@@ -196,9 +187,9 @@ export function OutlinePanel(props: OutlinePanelProps) {
 
   const panelStyle = chrome.left !== null && chrome.top !== null
     ? { width: PANEL_WIDTH, left: chrome.left, top: chrome.top }
-    : { width: PANEL_WIDTH, right: 44, top: '30%' }
+    : { width: PANEL_WIDTH, right: 30, top: '30%' }
 
-  return (
+  const panelNode = visible ? (
     <div
       ref={panelRef}
       className={css.panel}
@@ -338,5 +329,27 @@ export function OutlinePanel(props: OutlinePanelProps) {
         </button>
       </div>
     </div>
+  ) : null
+
+  // 固定状态只渲染面板；未固定时触发条常驻、peek 才挂面板。
+  // 预览期间触发条保持挂载且与面板共享一条边（面板 right:30 = 触发条宽度），
+  // 指针零死区滑入滑出，不存在"面板替换触发条后 pointerleave 丢失"的卡住路径。
+  if (chrome.pinned) return panelNode
+  return (
+    <>
+      <button
+        type="button"
+        className={css.edgeTrigger}
+        title={t('panel.open')}
+        aria-label={t('panel.open')}
+        aria-expanded={peek}
+        onPointerEnter={onHoverEnter}
+        onPointerLeave={onHoverLeave}
+        onClick={() => store.set({ pinned: true })}
+      >
+        <OutlineGlyph />
+      </button>
+      {panelNode}
+    </>
   )
 }
