@@ -53,11 +53,35 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 重跑同一 tag 时 release 已存在：改为覆盖上传制品，保证幂等
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          # Release notes = 使用方式（手写） + What's Changed（generate-notes 自动汇总 PR/commit）
+          NOTES=$(mktemp)
+          cat > "$NOTES" <<EOF
+          ## 使用方式
+
+          **安装（tarball，推荐）**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`，然后：
+
+          \`\`\`sh
+          dsh plugin --profile web add ./dsh-outline-${VERSION}.tgz
+          \`\`\`
+
+          **npm**：\`dsh plugin --profile web add dsh-outline\`（如本次发布已同步 npm）
+
+          安装后重启 \`dsh web\` 生效。
+
+          **使用**：会话页右缘悬停大纲触发条即可预览面板；点击触发条或面板右上角的固定按钮可将面板固定常驻；拖动标题栏移动面板位置（拖动即固定）。
+
+          ---
+
+          EOF
+          gh api "repos/${{ github.repository }}/releases/generate-notes" -f tag_name="$TAG" --jq .body >> "$NOTES"
+          # 重跑同一 tag 时 release 已存在：覆盖制品并更新 notes，保证幂等
           if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
-            gh release upload "${{ github.ref_name }}" ./dsh-outline-*.tgz --clobber
+            gh release upload "$TAG" ./dsh-outline-*.tgz --clobber
+            gh release edit "$TAG" --notes-file "$NOTES"
           else
-            gh release create "${{ github.ref_name }}" --generate-notes --verify-tag ./dsh-outline-*.tgz
+            gh release create "$TAG" --notes-file "$NOTES" --verify-tag ./dsh-outline-*.tgz
           fi
 
       - name: Publish to npm
