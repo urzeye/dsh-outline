@@ -66,14 +66,6 @@ jobs:
           npx @deepseek-ai/dsh plugin --profile web add dsh-outline
           \`\`\`
 
-          **从 GitHub 安装**：
-
-          \`\`\`sh
-          npx @deepseek-ai/dsh plugin --profile web add github:${{ github.repository }}#${TAG}
-          \`\`\`
-
-          git 安装会在安装时执行本包构建脚本，pnpm ≥10 首次会提示把包加入 profile 的 \`allowBuilds\` 后重试。
-
           **tarball**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`：
 
           \`\`\`sh

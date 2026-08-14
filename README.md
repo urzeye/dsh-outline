@@ -27,26 +27,8 @@ npx @deepseek-ai/dsh plugin --profile web add dsh-outline
 
 ```sh
 pnpm pack                                          # 产出 dsh-outline-<version>.tgz
-npx @deepseek-ai/dsh plugin --profile web add ./dsh-outline-0.1.0.tgz
+npx @deepseek-ai/dsh plugin --profile web add ./dsh-outline-0.1.1.tgz
 ```
-
-### 从 GitHub 安装
-
-git 安装拉取的是源码而非构建产物，本包通过 `prepare` 脚本在安装时构建：
-
-```sh
-npx @deepseek-ai/dsh plugin --profile web add github:urzeye/dsh-outline
-```
-
-pnpm ≥10 在得到显式允许前拒绝运行 git 依赖的 `prepare`，首次 `add` 会失败并提示修法：把包键加入该 profile 的 `pnpm-workspace.yaml` 后重试：
-
-```yaml
-# $DSH_HOME/profiles/web/pnpm-workspace.yaml
-allowBuilds:
-  dsh-outline: true
-```
-
-注意：这表示**允许该包的代码在安装时在你的机器上执行**。只对可信来源授权，并锁定 commit（`github:urzeye/dsh-outline#<sha>`），避免后续推送悄悄改变实际运行的内容。
 
 ### 本地路径安装（开发调试）
 
