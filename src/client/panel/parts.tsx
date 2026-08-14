@@ -127,18 +127,19 @@ export function OutlineGlyph() {
   )
 }
 
-export function MinusGlyph() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M3 7h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 export function CloseGlyph() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
       <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/** 固定/取消固定面板（移植自 Ophel PinIcon，fill 风格） */
+export function PinGlyph() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" aria-hidden="true">
+      <path d="M576 554.666667h160.341333a4.266667 4.266667 0 0 0 3.029334-7.253334l-2.986667-3.072-48.341333-48.298666-18.176-18.176-151.850667-151.850667a8.533333 8.533333 0 0 0-12.032 0L354.133333 477.866667l-18.176 18.176L287.573333 544.426667l-2.986666 2.986666a4.266667 4.266667 0 0 0 2.986666 7.253334H448v290.133333c0 4.736 3.84 8.533333 8.533333 8.533333h110.933334a8.533333 8.533333 0 0 0 8.533333-8.533333V554.666667z m160.384 76.8H652.8v213.333333a85.333333 85.333333 0 0 1-85.333333 85.333333h-110.933334a85.333333 85.333333 0 0 1-85.333333-85.333333v-213.333333H287.616c-72.192 0-108.373333-87.338667-57.301333-138.410667l221.354666-221.312a85.333333 85.333333 0 0 1 120.661334 0l221.354666 221.312c51.072 51.072 14.933333 138.410667-57.301333 138.410667zM256 89.6a38.4 38.4 0 0 0 0 76.8h512a38.4 38.4 0 1 0 0-76.8H256z" />
     </svg>
   )
 }

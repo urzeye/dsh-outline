@@ -473,17 +473,17 @@
   outline-offset: 1px;
 }
 
-/* ---- 最小化后的边缘窄条 ---- */
+/* ---- 右缘触发条：hover 预览面板，点击固定 ---- */
 
-.minibar {
+.edgeTrigger {
   position: absolute;
   right: 0;
-  top: 120px;
+  top: 30%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 48px;
+  width: 30px;
+  height: 52px;
   padding: 0;
   pointer-events: auto;
   border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.08));
@@ -496,57 +496,20 @@
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.minibar:hover {
+.edgeTrigger:hover {
   color: var(--dsw-alias-state-business-primary, #4176e6);
   background: var(--dsw-alias-state-business-tertiary, #e4edfd);
 }
 
-.minibar:focus-visible {
+.edgeTrigger:focus-visible {
   outline: 2px solid var(--dsw-alias-state-business-primary, #4176e6);
   outline-offset: 1px;
-}
-
-/* ---- 会话头部开关按钮：对齐 DSH 头部按钮的观感 ---- */
-
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--dsw-alias-label-tertiary, #65666b);
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-}
-
-.toggle:hover {
-  background: var(--dsw-alias-interactive-bg-hover, rgba(38, 49, 72, 0.06));
-  color: var(--dsw-alias-label-primary, #0f1115);
-}
-
-.toggle:active {
-  transform: scale(0.9);
-}
-
-.toggle:focus-visible {
-  outline: 2px solid var(--dsw-alias-state-business-primary, #4176e6);
-  outline-offset: 1px;
-}
-
-.toggleActive {
-  color: var(--dsw-alias-state-business-primary, #4176e6);
-  background: var(--dsw-alias-state-business-tertiary, #e4edfd);
 }
 
 /* 减少动效偏好：关掉全部过渡和脉动动画 */
 @media (prefers-reduced-motion: reduce) {
   .panel *,
-  .minibar,
-  .toggle {
+  .edgeTrigger {
     transition-duration: 0.01ms !important;
     animation: none !important;
   }

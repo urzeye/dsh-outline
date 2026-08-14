@@ -1,12 +1,12 @@
 /**
- * 面板外壳状态（开/关、最小化、拖拽位置）+ 轻量偏好持久化。
- * 只用 localStorage 记用户显式偏好（开关、位置、默认层级、收藏），
+ * 面板外壳状态（固定/预览、拖拽位置）+ 轻量偏好持久化。
+ * pinned=false 时面板只在悬浮触发条上临时预览；pinned=true 才常驻。
+ * 只用 localStorage 记用户显式偏好（固定、位置、默认层级、收藏），
  * 会话数据一律来自 runtime，不写第二份。
  */
 
 export interface ChromeState {
-  open: boolean
-  minimized: boolean
+  pinned: boolean
   /** 拖拽后的绝对位置；null = 默认停靠右侧。 */
   left: number | null
   top: number | null
@@ -41,10 +41,10 @@ function writeJson(key: string, value: unknown): void {
 }
 
 export function createChromeStore(): ChromeStore {
-  const saved = readJson<Partial<ChromeState>>(CHROME_KEY)
+  // 旧版本字段是 open/minimized：open=true 迁移为 pinned=true，minimized 丢弃
+  const saved = readJson<Partial<ChromeState> & { open?: boolean }>(CHROME_KEY)
   let state: ChromeState = {
-    open: saved?.open ?? true,
-    minimized: saved?.minimized ?? false,
+    pinned: saved?.pinned ?? saved?.open ?? false,
     left: saved?.left ?? null,
     top: saved?.top ?? null,
   }

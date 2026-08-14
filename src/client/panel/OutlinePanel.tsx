@@ -6,7 +6,7 @@
  * buildOutlineItems 扁平化 → OutlineManager（core，持有层级/搜索/收藏状态）。
  * 面板自身只渲染与转发交互，不持有业务状态副本。
  */
-import { useCallback, useEffect, useMemo, useReducer, useRef, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ISessions } from '@deepseek-ai/dsh-client-runtime/client'
 import { OutlineManager } from '../../core/outline-manager.ts'
@@ -19,8 +19,8 @@ import {
   loadBookmarks, loadExpandLevel, saveBookmarks, saveExpandLevel, type ChromeStore,
 } from '../store.ts'
 import {
-  CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, MinusGlyph, OutlineGlyph,
-  OutlineRow, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
+  CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, OutlineGlyph,
+  OutlineRow, PinGlyph, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
 } from './parts.tsx'
 import css from './panel.module.css'
 
@@ -38,6 +38,25 @@ export function OutlinePanel(props: OutlinePanelProps) {
   const { store, sessions, useSessions, t } = props
   const chrome = useSyncExternalStore(store.subscribe, store.getSnapshot)
   const sessionId = useSessions((s) => s.current)
+
+  // 悬浮预览：触发条和面板共享 hover 区域，进/出各带短延迟防抖。
+  // peek 是纯瞬态 UI 状态，不进 store 不持久化。
+  const [peek, setPeek] = useState(false)
+  const enterTimer = useRef(0)
+  const leaveTimer = useRef(0)
+  useEffect(() => () => {
+    window.clearTimeout(enterTimer.current)
+    window.clearTimeout(leaveTimer.current)
+  }, [])
+  const onHoverEnter = useCallback((): void => {
+    window.clearTimeout(leaveTimer.current)
+    enterTimer.current = window.setTimeout(() => setPeek(true), 120)
+  }, [])
+  const onHoverLeave = useCallback((): void => {
+    window.clearTimeout(enterTimer.current)
+    leaveTimer.current = window.setTimeout(() => setPeek(false), 200)
+  }, [])
+  const visible = chrome.pinned || peek
 
   // 每个会话一个大纲管理器（书签按会话持久化，层级偏好全局）
   const manager = useMemo(() => {
@@ -78,7 +97,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
   const activeIdRef = useRef<string | null>(null)
   const [, bumpActive] = useReducer((x: number) => x + 1, 0)
   useEffect(() => {
-    if (!chrome.open || state === undefined) return
+    if (!visible || state === undefined) return
     const root = findChatRoot()
     if (root === null) return
     const flat: OutlineNode[] = []
@@ -107,7 +126,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
       root.removeEventListener('scroll', onScroll, { capture: true })
       if (raf !== 0) window.cancelAnimationFrame(raf)
     }
-  }, [chrome.open, state, sessionId])
+  }, [visible, state, sessionId])
 
   // 标题栏拖拽（clamp 在视口内，松手时持久化）
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -126,29 +145,28 @@ export function OutlinePanel(props: OutlinePanelProps) {
     const onUp = (ev: PointerEvent): void => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
+      // 拖拽即视为固定意图：位置持久化的同时把面板钉住
       store.set({
         left: Math.max(0, Math.min(window.innerWidth - rect.width, ev.clientX - dx)),
         top: Math.max(0, Math.min(window.innerHeight - 80, ev.clientY - dy)),
+        pinned: true,
       })
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
   }, [store])
 
-  if (!chrome.open) return null
-
-  if (chrome.minimized) {
-    const minStyle = chrome.left !== null && chrome.top !== null
-      ? { left: chrome.left, top: chrome.top }
-      : undefined
+  // 未固定且未悬浮时只剩右缘触发条；点击触发条 = 直接固定
+  if (!visible) {
     return (
       <button
         type="button"
-        className={css.minibar}
-        style={minStyle}
-        title={t('panel.restore')}
-        aria-label={t('panel.restore')}
-        onClick={() => store.set({ minimized: false })}
+        className={css.edgeTrigger}
+        title={t('panel.open')}
+        aria-label={t('panel.open')}
+        onPointerEnter={onHoverEnter}
+        onPointerLeave={onHoverLeave}
+        onClick={() => store.set({ pinned: true })}
       >
         <OutlineGlyph />
       </button>
@@ -178,7 +196,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
 
   const panelStyle = chrome.left !== null && chrome.top !== null
     ? { width: PANEL_WIDTH, left: chrome.left, top: chrome.top }
-    : { width: PANEL_WIDTH, right: 16, top: 88 }
+    : { width: PANEL_WIDTH, right: 44, top: '30%' }
 
   return (
     <div
@@ -187,25 +205,31 @@ export function OutlinePanel(props: OutlinePanelProps) {
       style={panelStyle}
       role="complementary"
       aria-label={t('panel.title')}
+      onPointerEnter={onHoverEnter}
+      onPointerLeave={onHoverLeave}
     >
       <div className={css.header} onPointerDown={onDragStart}>
         <span className={css.headerGlyph}><OutlineGlyph /></span>
         <span className={css.title}>{t('panel.title')}</span>
         <button
           type="button"
-          className={css.iconBtn}
-          title={t('panel.minimize')}
-          aria-label={t('panel.minimize')}
-          onClick={() => store.set({ minimized: true })}
+          className={chrome.pinned ? `${css.iconBtn} ${css.iconBtnActive}` : css.iconBtn}
+          title={chrome.pinned ? t('panel.unpin') : t('panel.pin')}
+          aria-label={chrome.pinned ? t('panel.unpin') : t('panel.pin')}
+          aria-pressed={chrome.pinned}
+          onClick={() => store.set({ pinned: !chrome.pinned })}
         >
-          <MinusGlyph />
+          <PinGlyph />
         </button>
         <button
           type="button"
           className={css.iconBtn}
           title={t('panel.close')}
           aria-label={t('panel.close')}
-          onClick={() => store.set({ open: false })}
+          onClick={() => {
+            store.set({ pinned: false })
+            setPeek(false)
+          }}
         >
           <CloseGlyph />
         </button>
