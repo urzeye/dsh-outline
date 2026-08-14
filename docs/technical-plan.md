@@ -1,4 +1,4 @@
-# 技术方案与实施计划：dsh-ui-outline
+# 技术方案与实施计划：dsh-outline
 
 前置阅读：[feasibility.md](feasibility.md)。工程模板照抄 [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)，大纲逻辑移植自 Ophel。
 
@@ -12,12 +12,12 @@
 
 ## 架构总览
 
-单包插件（npm 包 `dsh-ui-outline`），只做 client 半 + 极简 host 挂载，不动 agent loop：
+单包插件（npm 包 `dsh-outline`），只做 client 半 + 极简 host 挂载，不动 agent loop：
 
 ```
-dsh-ui-outline/
+dsh-outline/
 ├─ package.json            # dsh.client 声明 + exports["./client"]；dsh 包全走 peerDependencies
-├─ dsh.plugin.json         # 插件清单（id: dsh-external/dsh-ui-outline）
+├─ dsh.plugin.json         # 插件清单（id: dsh-external/dsh-outline）
 ├─ cordis.patch.yml        # 挂载补丁（dsh plugin add 自动应用）
 ├─ tsdown.config.ts        # client bundle 构建（照 DSH-better-sidebar）
 ├─ src/
@@ -57,11 +57,11 @@ export const inject = ['slots', 'sessions', 'locale']
 export function apply(ctx: ClientContext) {
   const store = createOutlineStore() // 开/关、位置、层级等面板状态（每次激活一个实例）
   ctx.slots.inject('shell.overlay', () => ctx.slots.register(
-    { name: 'shell.overlay', id: 'ui-outline', order: 100, inject: () => ({ store }) },
+    { name: 'shell.overlay', id: 'outline', order: 100, inject: () => ({ store }) },
     OutlinePanel,
   ))
   ctx.slots.inject('conversation.session.header.utilities', () => ctx.slots.register(
-    { name: 'conversation.session.header.utilities', id: 'ui-outline', order: 100, inject: () => ({ store }) },
+    { name: 'conversation.session.header.utilities', id: 'outline', order: 100, inject: () => ({ store }) },
     OutlineToggleButton,
   ))
 }
@@ -71,7 +71,7 @@ export function apply(ctx: ClientContext) {
 
 - 默认停靠在会话页右侧、composer 之上，不进入聊天滚动容器（overlay 层独立于三列，聊天区不需要让宽；面板默认宽度 320px，只覆盖右缘空白/详情列收起后的区域）。
 - 标题栏拖拽移动，位置 clamp 在视口内，下边界不越过 composer 顶；
-- 位置与开/关状态持久化（localStorage，键前缀 `dsh-ui-outline:`；DSH layout 自身也不用 localStorage 存几何，我们这里仅记用户显式拖动结果，属可接受的轻量偏好）；
+- 位置与开/关状态持久化（localStorage，键前缀 `dsh-outline:`；DSH layout 自身也不用 localStorage 存几何，我们这里仅记用户显式拖动结果，属可接受的轻量偏好）；
 - 可最小化为边缘把手（收起为窄条，点击展开）；z-index 低于 shell 的 toast/对话框层；
 - 数据获取：overlay 是 root 作用域，用全局标准钩子 `useSessions` 拿当前 sessionId，再经 `ctx.sessions.binding(sessionId)` 取得 `SessionFace`（`ObservableSnapshot<ConversationSnapshot>`）订阅会话快照。
 

@@ -18,9 +18,9 @@ export interface ChromeStore {
   set(patch: Partial<ChromeState>): void
 }
 
-const CHROME_KEY = 'dsh-ui-outline:panel'
-const LEVEL_KEY = 'dsh-ui-outline:expandLevel'
-const BOOKMARKS_PREFIX = 'dsh-ui-outline:bookmarks:'
+const CHROME_KEY = 'dsh-outline:panel'
+const LEVEL_KEY = 'dsh-outline:expandLevel'
+const BOOKMARKS_PREFIX = 'dsh-outline:bookmarks:'
 const BOOKMARKS_CAP = 200
 
 function readJson<T>(key: string): T | null {

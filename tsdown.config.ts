@@ -1,14 +1,14 @@
 /**
- * tsdown build for dsh-ui-outline: the host-half lib (lib/index.js, ESM node)
+ * tsdown build for dsh-outline: the host-half lib (lib/index.js, ESM node)
  * plus the two browser client bundles (lib/client.js and
  * lib/client-registry.js, CJS closure factory) — one per install channel:
  *
  * - `lib/client.js` serves the official profile channel, registering with
- *   the package-name id `dsh-ui-outline` (the client-modules compose keys on
+ *   the package-name id `dsh-outline` (the client-modules compose keys on
  *   the package name; keep it in sync with package.json `name`),
  * - `lib/client-registry.js` serves the plugin-registry channel
  *   (dsh.plugin.json), registering with the manifest id
- *   `dsh-external/dsh-ui-outline` (the registry browser-side check requires
+ *   `dsh-external/dsh-outline` (the registry browser-side check requires
  *   bundle id === plugin id).
  *
  * Both bundles replicate the official DSH client-bundle preset
@@ -200,7 +200,7 @@ export default [
     clean: false,
   },
   // Official profile channel: bundle id = package name (package.json `name`).
-  clientBundle('dsh-ui-outline', 'client.js'),
+  clientBundle('dsh-outline', 'client.js'),
   // Plugin-registry channel: bundle id = manifest id (dsh.plugin.json `id`).
-  clientBundle('dsh-external/dsh-ui-outline', 'client-registry.js'),
+  clientBundle('dsh-external/dsh-outline', 'client-registry.js'),
 ] satisfies UserConfig[]

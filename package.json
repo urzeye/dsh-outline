@@ -1,12 +1,12 @@
 {
-  "name": "dsh-ui-outline",
+  "name": "dsh-outline",
   "version": "0.1.0",
   "description": "DSH web plugin: a realtime conversation outline panel (user questions + markdown headings) for the DeepSeek Harness Web GUI.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/urzeye/dsh-ui-outline"
+    "url": "https://github.com/urzeye/dsh-outline"
   },
   "publishConfig": {
     "access": "public"

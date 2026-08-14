@@ -1,4 +1,4 @@
-# 可行性分析：dsh-ui-outline
+# 可行性分析：dsh-outline
 
 日期：2026-08-14 · 证据来源：DSH 官方 reference 文档、deepseek-ai/deepseek-harness 仓库源码、`demo.htm`（DSH Web GUI 实际页面快照）、Ophel 仓库现网代码、DSH-better-sidebar 仓库。
 

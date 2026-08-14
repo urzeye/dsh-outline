@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-`dsh-ui-outline`：DeepSeek Harness（DSH）Web GUI 的实时大纲插件。方案与背景见 `docs/feasibility.md`、`docs/technical-plan.md`，动手前先读这两份文档。
+`dsh-outline`：DeepSeek Harness（DSH）Web GUI 的实时大纲插件。方案与背景见 `docs/feasibility.md`、`docs/technical-plan.md`，动手前先读这两份文档。
 
 ## 硬性约束
 

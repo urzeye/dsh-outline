@@ -1,6 +1,6 @@
-# dsh-ui-outline bundle patch: `dsh plugin --profile <name> add dsh-ui-outline`
+# dsh-outline bundle patch: `dsh plugin --profile <name> add dsh-outline`
 # reconciles dsh.profile.bundles against installed packages and appends this
 # bundle; the profile boot merges this single `insert` row. No profile edits.
 - insert:
-    - id: ui-outline
-      name: 'dsh-ui-outline'
+    - id: outline
+      name: 'dsh-outline'
