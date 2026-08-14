@@ -5,6 +5,7 @@
 [![node](https://img.shields.io/badge/node-%3E%3D22.13-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![ci](https://img.shields.io/github/actions/workflow/status/urzeye/dsh-outline/ci.yml?branch=main&label=ci)](https://github.com/urzeye/dsh-outline/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/actions/workflow/status/urzeye/dsh-outline/release.yml?label=release)](https://github.com/urzeye/dsh-outline/actions/workflows/release.yml)
+[![awesome · DSH plugin](https://awesome-dsh-plugin.com/badge.svg)](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)
 
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（DSH）Web GUI 的**实时大纲插件**：在会话页提供一棵"用户问题 + Markdown 标题（H1~H6）"的大纲树，流式生成时实时更新，点击节点即可定位正文并高亮当前阅读位置。
 
