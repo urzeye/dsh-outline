@@ -1,0 +1,41 @@
+# push 到 main 或发起 PR 时：安装依赖并跑完整检查（类型、测试、构建）。
+# 发布流程见 release.yml（打 tag 触发）。
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 版本取自 package.json 的 packageManager 字段。
+      # 注意必须 >= 10：本仓库的 pnpm-workspace.yaml 只放设置、没有 packages
+      # 字段，pnpm 9 会直接报 "packages field missing or empty"。
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
