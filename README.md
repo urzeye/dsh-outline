@@ -49,7 +49,7 @@ allowBuilds:
 ### 本地路径安装（开发调试）
 
 ```sh
-dsh plugin --profile web add D:\workspace\dsh-ui-outline   # 或相对路径 ./dsh-ui-outline
+dsh plugin --profile web add /path/to/dsh-outline   # 或相对路径 ./dsh-outline
 ```
 
 link 安装后 client 改动经 `pnpm watch` 重建即可 HMR 生效；host 半变更需重启 `dsh web`。
