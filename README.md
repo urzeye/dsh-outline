@@ -13,12 +13,12 @@ DeepSeek Harness（DSH）Web GUI 的**实时大纲插件**：在会话页面提�
 
 ## 安装
 
-以下命令均通过 `dsh plugin` 转发给 profile 目录内的 pnpm，安装后**重启 `dsh web`** 生效（host 半在启动时加载）。
+以下命令均通过 `npx @deepseek-ai/dsh plugin` 转发给 profile 目录内的 pnpm，安装后**重启 `npx @deepseek-ai/dsh web`** 生效（host 半在启动时加载）。
 
 ### 从 npm 安装（推荐）
 
 ```sh
-dsh plugin --profile web add dsh-outline
+npx @deepseek-ai/dsh plugin --profile web add dsh-outline
 ```
 
 ### 从 tarball 安装
@@ -27,7 +27,7 @@ dsh plugin --profile web add dsh-outline
 
 ```sh
 pnpm pack                                          # 产出 dsh-outline-<version>.tgz
-dsh plugin --profile web add ./dsh-outline-0.1.0.tgz
+npx @deepseek-ai/dsh plugin --profile web add ./dsh-outline-0.1.0.tgz
 ```
 
 ### 从 GitHub 安装
@@ -35,7 +35,7 @@ dsh plugin --profile web add ./dsh-outline-0.1.0.tgz
 git 安装拉取的是源码而非构建产物，本包通过 `prepare` 脚本在安装时构建：
 
 ```sh
-dsh plugin --profile web add github:urzeye/dsh-outline
+npx @deepseek-ai/dsh plugin --profile web add github:urzeye/dsh-outline
 ```
 
 pnpm ≥10 在得到显式允许前拒绝运行 git 依赖的 `prepare`，首次 `add` 会失败并提示修法：把包键加入该 profile 的 `pnpm-workspace.yaml` 后重试：
@@ -51,20 +51,20 @@ allowBuilds:
 ### 本地路径安装（开发调试）
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-outline   # 或相对路径 ./dsh-outline
+npx @deepseek-ai/dsh plugin --profile web add /path/to/dsh-outline   # 或相对路径 ./dsh-outline
 ```
 
-link 安装后 client 改动经 `pnpm watch` 重建即可 HMR 生效；host 半变更需重启 `dsh web`。
+link 安装后 client 改动经 `pnpm watch` 重建即可 HMR 生效；host 半变更需重启 `npx @deepseek-ai/dsh web`。
 
 ### 卸载
 
 ```sh
-dsh plugin --profile web remove dsh-outline
+npx @deepseek-ai/dsh plugin --profile web remove dsh-outline
 ```
 
 ## 使用
 
-1. 启动 `dsh web`，打开任意会话页。
+1. 启动 `npx @deepseek-ai/dsh web`，打开任意会话页。
 2. 鼠标悬停会话页右缘的大纲触发条，即可预览大纲面板。
 3. 点击触发条或面板右上角的固定按钮，将面板固定常驻；拖动标题栏移动位置（拖动即固定）。
 4. 面板内：点节点跳转正文；顶部滑块调整展开层级；节点行内提供展开/收起与收藏按钮；支持关键词搜索。
