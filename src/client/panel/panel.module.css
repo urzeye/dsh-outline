@@ -291,11 +291,10 @@
   outline-offset: -2px;
 }
 
-/* 当前阅读位置：底色 + 左侧 2px 强调条 */
+/* 当前阅读位置：只用浅底色区分，不叠强调条 */
 .itemActive {
   background: var(--dsw-alias-state-business-tertiary, #e4edfd);
   color: var(--dsw-alias-label-primary, #0f1115);
-  box-shadow: inset 2px 0 0 var(--dsw-alias-state-business-primary, #4176e6);
 }
 
 .itemUser {
