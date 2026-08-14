@@ -60,13 +60,25 @@ jobs:
           cat > "$NOTES" <<EOF
           ## 使用方式
 
-          **安装（tarball，推荐）**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`，然后：
+          **安装（npm，推荐）**：
+
+          \`\`\`sh
+          dsh plugin --profile web add dsh-outline
+          \`\`\`
+
+          **从 GitHub 安装**：
+
+          \`\`\`sh
+          dsh plugin --profile web add github:${{ github.repository }}#${TAG}
+          \`\`\`
+
+          git 安装会在安装时执行本包构建脚本，pnpm ≥10 首次会提示把包加入 profile 的 \`allowBuilds\` 后重试。
+
+          **tarball**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`：
 
           \`\`\`sh
           dsh plugin --profile web add ./dsh-outline-${VERSION}.tgz
           \`\`\`
-
-          **npm**：\`dsh plugin --profile web add dsh-outline\`（如本次发布已同步 npm）
 
           安装后重启 \`dsh web\` 生效。
 
