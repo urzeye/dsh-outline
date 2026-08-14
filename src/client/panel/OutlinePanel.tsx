@@ -19,8 +19,8 @@ import {
   loadBookmarks, loadExpandLevel, saveBookmarks, saveExpandLevel, type ChromeStore,
 } from '../store.ts'
 import {
-  CloseGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, MinusGlyph, OutlineGlyph, OutlineRow,
-  ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
+  CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, MinusGlyph, OutlineGlyph,
+  OutlineRow, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
 } from './parts.tsx'
 import css from './panel.module.css'
 
@@ -218,7 +218,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
           aria-label={state?.isAllExpanded === true ? t('action.collapseAll') : t('action.expandAll')}
           onClick={() => state?.isAllExpanded === true ? manager?.collapseAll() : manager?.expandAll()}
         >
-          <ExpandAllGlyph />
+          {state?.isAllExpanded === true ? <CollapseAllGlyph /> : <ExpandAllGlyph />}
         </button>
         <button
           type="button"
