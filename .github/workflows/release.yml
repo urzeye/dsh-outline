@@ -1,0 +1,57 @@
+# 推送形如 v0.2.0 的 tag 时：校验 tag 与 package.json 版本一致，
+# 跑完整检查，构建产物，创建 GitHub Release，可选发布 npm。
+#
+# 启用 npm 发布需要两个仓库配置：
+#   1. Secrets 里加 NPM_TOKEN（npm 的 Automation token）
+#   2. Variables 里加 NPM_PUBLISH=true
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # lockfileVersion 9.x 对应 pnpm 9
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify tag matches package version
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "${{ github.ref_name }}" != "v$PKG_VERSION" ]; then
+            echo "::error::tag ${{ github.ref_name }} != package.json version v$PKG_VERSION"
+            exit 1
+          fi
+
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ github.ref_name }}" --generate-notes --verify-tag
+
+      - name: Publish to npm
+        if: vars.NPM_PUBLISH == 'true'
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
