@@ -1,0 +1,11 @@
+{
+  "//": "Declaration build: emits lib/types/*.d.ts from src (typecheck gate stays `tsc --noEmit`; tsdown bundles the JS).",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "lib/types"
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,14 @@
+/* 点击定位的目标高亮：打在正文元素上（面板外），必须是全局（非 module）规则。 */
+.dsho-anchor-flash {
+  animation: dsho-anchor-flash 1.6s ease-out;
+  border-radius: 4px;
+}
+
+@keyframes dsho-anchor-flash {
+  0% {
+    background-color: var(--dsw-alias-state-business-tertiary, rgba(65, 118, 230, 0.18));
+  }
+  100% {
+    background-color: transparent;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "dsh-external/dsh-ui-outline",
+  "version": "0.1.0",
+  "main": "./lib/index.js",
+  "description": "实时会话大纲面板：用户问题 + Markdown 标题树，支持层级滑块、搜索、收藏与点击定位",
+  "engines": {
+    "dsh": ">=0.0.1"
+  },
+  "contributes": {
+    "tools": [],
+    "skills": []
+  },
+  "client": {
+    "main": "./lib/client-registry.js"
+  }
+}
