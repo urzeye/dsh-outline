@@ -45,10 +45,20 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+      # 打出插件 tarball 作为 Release 制品（dsh plugin add 可直接装 tgz）
+      - name: Pack plugin tarball
+        run: pnpm pack
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ github.ref_name }}" --generate-notes --verify-tag
+        run: |
+          # 重跑同一 tag 时 release 已存在：改为覆盖上传制品，保证幂等
+          if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
+            gh release upload "${{ github.ref_name }}" ./dsh-outline-*.tgz --clobber
+          else
+            gh release create "${{ github.ref_name }}" --generate-notes --verify-tag ./dsh-outline-*.tgz
+          fi
 
       - name: Publish to npm
         if: vars.NPM_PUBLISH == 'true'
