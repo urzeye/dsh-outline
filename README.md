@@ -66,3 +66,7 @@ pnpm typecheck
 
 - [docs/feasibility.md](docs/feasibility.md) — 可行性分析（证据、能力映射、边界）
 - [docs/technical-plan.md](docs/technical-plan.md) — 技术方案与分阶段实施计划
+
+## 友链
+
+- [LINUX DO](https://linux.do) — 新的理想型社区
