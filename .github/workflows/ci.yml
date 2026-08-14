@@ -18,8 +18,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [20, 22]
+        # pnpm@11（packageManager 锁定）要求 Node >= 22.13，20 无法安装依赖
+        node-version: [22, 24]
 
     steps:
       - uses: actions/checkout@v4
