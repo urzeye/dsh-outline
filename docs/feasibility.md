@@ -11,7 +11,7 @@
 ### 插件形态与安装
 
 - 插件 = npm 包。包内 `dsh.plugin.json`（id/version/client 入口）+ `cordis.patch.yml`（挂载补丁），通过官方 CLI 安装挂载：
-  `npx -y --package @deepseek-ai/dsh dsh plugin --profile web add <pkg>`
+  `dsh plugin --profile web add <pkg>`
   （DSH-better-sidebar 即此模式，不改 DSH 源码。）
 - 浏览器半：在 `package.json` 声明 `dsh.client`（`platform: 'web'`、可选 `inject` 依赖边），并在 `exports["./client"]` 导出构建好的 bundle。host 扫描后组合 `window.__DSH_BOOT__` entry 图，经 `/plugins/<id>/client.js` 提供 bundle；client bundle 变更支持 HMR（`dsh-client-hmr`，SSE 广播 rev）。
 - 客户端包用 tsdown 构建（DSH-better-sidebar 的现成配置可直接参考），dsh 系列包作为 peerDependency/external。

@@ -21,7 +21,7 @@
 - 构建：`pnpm build`（tsdown client bundle + tsc 类型）
 - 类型检查：`pnpm typecheck`
 - 测试：`pnpm test`（vitest）
-- 本地安装到 DSH：`npx -y --package @deepseek-ai/dsh dsh plugin --profile web add <本包>`；client 改动 HMR 生效，host 半改动需重启 DSH。
+- 本地安装到 DSH：`dsh plugin --profile web add <本包>`；client 改动 HMR 生效，host 半改动需重启 DSH。
 
 ## 验证
 

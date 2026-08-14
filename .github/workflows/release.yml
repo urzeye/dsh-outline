@@ -63,16 +63,16 @@ jobs:
           **安装（npm，推荐）**：
 
           \`\`\`sh
-          npx @deepseek-ai/dsh plugin --profile web add dsh-outline
+          dsh plugin --profile web add dsh-outline
           \`\`\`
 
           **tarball**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`：
 
           \`\`\`sh
-          npx @deepseek-ai/dsh plugin --profile web add ./dsh-outline-${VERSION}.tgz
+          dsh plugin --profile web add ./dsh-outline-${VERSION}.tgz
           \`\`\`
 
-          安装后重启 \`npx @deepseek-ai/dsh web\` 生效。
+          安装后重启 \`dsh web\` 生效。
 
           **使用**：会话页右缘悬停大纲触发条即可预览面板；点击触发条或面板右上角的固定按钮可将面板固定常驻；拖动标题栏移动面板位置（拖动即固定）。
 
