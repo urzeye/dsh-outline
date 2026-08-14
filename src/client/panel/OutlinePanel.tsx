@@ -19,7 +19,8 @@ import {
   loadBookmarks, loadExpandLevel, saveBookmarks, saveExpandLevel, type ChromeStore,
 } from '../store.ts'
 import {
-  CloseGlyph, CopyGlyph, ExpandGlyph, LevelSlider, MinusGlyph, OutlineGlyph, OutlineRow, StarGlyph,
+  CloseGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, MinusGlyph, OutlineGlyph, OutlineRow,
+  ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
 } from './parts.tsx'
 import css from './panel.module.css'
 
@@ -188,7 +189,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
       aria-label={t('panel.title')}
     >
       <div className={css.header} onPointerDown={onDragStart}>
-        <OutlineGlyph />
+        <span className={css.headerGlyph}><OutlineGlyph /></span>
         <span className={css.title}>{t('panel.title')}</span>
         <button
           type="button"
@@ -217,11 +218,11 @@ export function OutlinePanel(props: OutlinePanelProps) {
           aria-label={state?.isAllExpanded === true ? t('action.collapseAll') : t('action.expandAll')}
           onClick={() => state?.isAllExpanded === true ? manager?.collapseAll() : manager?.expandAll()}
         >
-          <ExpandGlyph />
+          <ExpandAllGlyph />
         </button>
         <button
           type="button"
-          className={state?.bookmarkMode === true ? css.iconBtnActive : css.iconBtn}
+          className={state?.bookmarkMode === true ? `${css.iconBtn} ${css.iconBtnActive}` : css.iconBtn}
           title={t('action.bookmarkMode')}
           aria-label={t('action.bookmarkMode')}
           aria-pressed={state?.bookmarkMode ?? false}
@@ -238,13 +239,27 @@ export function OutlinePanel(props: OutlinePanelProps) {
         >
           <CopyGlyph />
         </button>
-        <input
-          className={css.search}
-          type="search"
-          placeholder={t('search.placeholder')}
-          value={state?.searchQuery ?? ''}
-          onChange={(e) => manager?.setSearchQuery(e.target.value)}
-        />
+        <div className={css.searchBox}>
+          <span className={css.searchIcon}><SearchGlyph /></span>
+          <input
+            className={css.search}
+            type="search"
+            placeholder={t('search.placeholder')}
+            value={state?.searchQuery ?? ''}
+            onChange={(e) => manager?.setSearchQuery(e.target.value)}
+          />
+          {state !== undefined && state.searchQuery !== '' && (
+            <button
+              type="button"
+              className={css.searchClear}
+              title={t('search.clear')}
+              aria-label={t('search.clear')}
+              onClick={() => manager?.setSearchQuery('')}
+            >
+              <CloseGlyph />
+            </button>
+          )}
+        </div>
       </div>
       <LevelSlider
         expandLevel={state?.expandLevel ?? 6}
@@ -255,6 +270,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
       <div className={css.list}>
         {state === undefined || state.visible.length === 0 ? (
           <div className={css.empty}>
+            <span className={css.emptyGlyph}><OutlineGlyph /></span>
             <div>{t('panel.empty')}</div>
             <div className={css.emptyHint}>{t('panel.emptyHint')}</div>
           </div>
@@ -282,6 +298,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
             if (root !== null) scrollChatToTop(root)
           }}
         >
+          <ScrollTopGlyph />
           {t('action.scrollTop')}
         </button>
         <button
@@ -292,6 +309,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
             if (root !== null) scrollChatToBottom(root)
           }}
         >
+          <ScrollBottomGlyph />
           {t('action.scrollBottom')}
         </button>
       </div>

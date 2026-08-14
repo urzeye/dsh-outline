@@ -19,7 +19,7 @@ export function OutlineToggleButton(props: OutlineToggleProps) {
   return (
     <button
       type="button"
-      className={chrome.open ? css.toggleActive : css.toggle}
+      className={chrome.open ? `${css.toggle} ${css.toggleActive}` : css.toggle}
       title={t('panel.open')}
       aria-label={t('panel.open')}
       aria-pressed={chrome.open}
