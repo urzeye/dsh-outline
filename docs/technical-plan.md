@@ -49,21 +49,19 @@ dsh-outline/
 - `shell.overlay` 是 **list 席位、root 作用域、click-through 层**（条目自行恢复 pointer-events），文档原话即"a badge, a toast stack … the additive seat for a frame-wide surface of your own: a fresh id is added beside the shipped entries"——这就是官方给的浮动面板挂载位。
 - `conversation.session.header.utilities` 是 **list 席位、session 作用域**，框架标准套件直接给 `sessionId`/`useSession`/`useInput`/`inputActions`——大纲开关按钮注册在这里。
 
-最终结构：
+最终结构（实现定稿，与上表略有出入）：
 
 ```ts
 // src/client/index.ts（示意，签名以构建时类型为准）
 export const inject = ['slots', 'sessions', 'locale']
 export function apply(ctx: ClientContext) {
-  const store = createOutlineStore() // 开/关、位置、层级等面板状态（每次激活一个实例）
+  const store = createChromeStore() // 固定/位置、层级等面板状态（每次激活一个实例）
   ctx.slots.inject('shell.overlay', () => ctx.slots.register(
-    { name: 'shell.overlay', id: 'outline', order: 100, inject: () => ({ store }) },
+    { name: 'shell.overlay', id: 'outline', order: 100, inject: () => ({ store, sessions: ctx.sessions }) },
     OutlinePanel,
   ))
-  ctx.slots.inject('conversation.session.header.utilities', () => ctx.slots.register(
-    { name: 'conversation.session.header.utilities', id: 'outline', order: 100, inject: () => ({ store }) },
-    OutlineToggleButton,
-  ))
+  // 实际未注册 header 开关：改为面板自带的右缘触发条（hover 预览、点击固定），
+  // 见 src/client/panel/OutlinePanel.tsx 的 edgeTrigger。
 }
 ```
 
@@ -120,13 +118,13 @@ DOM 锚点实测（demo.htm）：聊天气泡带 `data-chat-flow-kind=user | ass
   - 树增量刷新：按节点 id 对账恢复 `collapsed`/`forceExpanded`（`captureCollapseState` / `restoreCollapseState`），新增子级按 `expandLevel` 规则初始化，不掀翻已折叠节点。
 - **联动规则**：
   - 搜索中调滑块置 `searchLevelManual = true`，搜索匹配结果仍强制展开到可见；
-  - 收藏模式下禁用滑块（档位点置灰，点击 toast 提示）；
+  - ~~收藏模式下禁用滑块（档位点置灰，点击 toast 提示）~~ —— **当前版本未实现**：`setLevel` 不检查 `bookmarkMode`，收藏模式下滑块仍可调（`flattenVisible` 在收藏模式绕过层级，视觉无感但会改写全局 expandLevel 偏好）；
   - 定位/搜索命中节点时对其祖先链强制可见（`forceVisible`），不修改 `collapsed` 本身。
 - **持久化**：`expandLevel` 作为用户偏好走 host settings（全局，不按会话）；节点级 `collapsed`/`forceExpanded` 是会话内瞬态，不持久化。
 
 ### 6. 样式与主题
 
-- 面板样式通过插件 CSS 注入通道（`<style data-plugin=...>`），类名前缀 `dsho-`。
+- 面板样式用 CSS Modules（`src/client/panel/panel.module.css`，编译为 hash 类名，天然隔离）；仅全局注入规则（如定位高亮 `dsho-anchor-flash`，见 `src/client/anchor.css`）保留 `dsho-` 前缀。
 - 颜色一律用 `--dsw-alias-*` / `--dsw-static-*` 变量（label-primary/secondary、interactive-bg-hover、border-l2、deepseek 品牌色），不写死色值，明暗主题自动跟随。
 - 视觉对齐 DSH 原生面板（14px 基础字号、24px 行高、6~8px 圆角），不做 Ophel 的阴影浮层风格（除非走 overlay 形态）。
 
@@ -149,6 +147,8 @@ DOM 锚点实测（demo.htm）：聊天气泡带 `data-chat-flow-kind=user | ass
 | P2 导航与层级 | 点击定位、active 高亮；层级滑块（0~6 档位点 + 计数 tooltip）、展开/收起全部、单节点展开（forceExpanded 语义）；顶/底部按钮 | 点击每个节点准确滚动；高亮跟随；单点展开的子树越过当前层级上限可见；调滑块后统一回到层级基准（forceExpanded 被清算）；增量刷新保留折叠态 |
 | P3 增强 | 搜索、收藏（按会话持久化）、进度点、复制/导出大纲（移植 export-outline） | 搜索过滤正确；收藏刷新不丢；导出 markdown 大纲 |
 | P4 打磨 | i18n 完善、主题走查（明/暗）、设置项（默认 expandLevel、显示用户提问开关，schema-form）、性能与边界用例 | vitest 通过；明暗主题无写死色；长会话（>100 节点）无卡顿 |
+
+> 当前状态：P0~P4 均已实现（v0.1.x）。本表为历史验收口径，部分条目与现状有出入——「显示用户提问开关」「header 开关按钮」未落地（面板改为右缘触发条形态），「收藏模式禁用滑块」亦未实现，详见上文标注。
 
 ## 测试策略
 
