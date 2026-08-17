@@ -49,8 +49,33 @@ export class OutlineManager {
     for (const fn of this.listeners) fn()
   }
 
+  /** 逐字段浅比较当前批次与上一批；长度不同或任一字段变化即判定不等。 */
+  private itemsEqual(items: readonly Omit<OutlineItem, 'id'>[]): boolean {
+    const prev = this.items
+    if (items.length !== prev.length) return false
+    for (let i = 0; i < items.length; i++) {
+      const a = items[i]
+      const b = prev[i]
+      // 长度相等时下标必然存在，这里仅满足 noUncheckedIndexedAccess
+      if (a === undefined || b === undefined) return false
+      if (
+        a.level !== b.level ||
+        a.text !== b.text ||
+        a.isUserQuery !== b.isUserQuery ||
+        a.userIndex !== b.userIndex ||
+        a.headingIndex !== b.headingIndex ||
+        a.streaming !== b.streaming ||
+        a.isTruncated !== b.isTruncated
+      ) return false
+    }
+    return true
+  }
+
   /** 数据源推送新一批扁平项。签名按当前批次重算（同文本多次出现按序消歧）。 */
   setItems(items: readonly Omit<OutlineItem, 'id'>[]): void {
+    // 浅比较：内容未变（层级/文本/角色/序号/流式标记）则跳过整树重建与通知，
+    // 避免无关快照更新（如 partial 里非 text block）引发无谓重建。
+    if (this.itemsEqual(items)) return
     const seen = new Map<string, number>()
     const signed: OutlineItem[] = items.map((item) => {
       const base = `${item.level}:${item.text}`

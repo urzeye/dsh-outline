@@ -134,4 +134,19 @@ describe('OutlineManager', () => {
     m.revealNode(h3.index)
     expect(m.getState().visible.map((n) => n.text)).toContain('细节a')
   })
+
+  it('setItems with shallow-equal content skips rebuild and notify', () => {
+    const m = new OutlineManager()
+    const fn = vi.fn()
+    m.subscribe(fn)
+    m.setItems(sample())
+    const calls = fn.mock.calls.length
+    // 相同内容、新对象引用：应跳过重建，不通知
+    m.setItems(sample())
+    expect(fn.mock.calls.length).toBe(calls)
+    // 任一字段变化：正常重建并通知
+    m.setItems([...sample(), { level: 2, text: '新标题', headingIndex: 3 }])
+    expect(fn.mock.calls.length).toBe(calls + 1)
+    expect(m.getState().visible.map((n) => n.text)).toContain('新标题')
+  })
 })
