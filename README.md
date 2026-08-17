@@ -57,7 +57,7 @@ dsh plugin --profile web add dsh-outline
 
 ```sh
 pnpm pack                                          # 产出 dsh-outline-<version>.tgz
-dsh plugin --profile web add ./dsh-outline-0.1.2.tgz
+dsh plugin --profile web add ./dsh-outline-0.1.3.tgz
 ```
 
 ### 本地路径安装（开发调试）
