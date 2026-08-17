@@ -11,6 +11,9 @@
 
 ![demo](./docs/media/demo.gif)
 
+> [!TIP]
+> 若您以浏览器方式使用 DeepSeek Harness，建议优先体验 [Ophel](https://github.com/urzeye/ophel)：专为浏览器场景深度优化，功能更全面、体验更流畅。
+
 ## 特性
 
 **实时大纲**
