@@ -23,6 +23,7 @@ export const zh = {
   'action.copied': '已复制',
   'action.scrollTop': '回到顶部',
   'action.scrollBottom': '回到底部',
+  'action.unlocatable': '当前节点暂不可定位',
 } satisfies Record<string, string>
 
 /** The outline namespace key union. */
@@ -51,6 +52,7 @@ export const en = {
   'action.copied': 'Copied',
   'action.scrollTop': 'Scroll to top',
   'action.scrollBottom': 'Scroll to bottom',
+  'action.unlocatable': 'This item is not available yet',
 } satisfies Record<OutlineKey, string>
 
 /** Dictionary namespace owned by this plugin. */

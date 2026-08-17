@@ -166,13 +166,23 @@ export function OutlinePanel(props: OutlinePanelProps) {
 
   const onItemClick = (node: OutlineNode): void => {
     const root = findChatRoot()
-    if (root !== null) scrollToItem(root, node)
+    const ok = root !== null && scrollToItem(root, node)
+    window.clearTimeout(unlocatableTimer.current)
+    setUnlocatable(!ok)
+    if (!ok) {
+      unlocatableTimer.current = window.setTimeout(() => setUnlocatable(false), 2000)
+    }
   }
 
   // 复制成功反馈：图标变对号 2 秒后恢复（复用字典里的 action.copied）
   const [copied, setCopied] = useState(false)
   const copiedTimer = useRef(0)
   useEffect(() => () => window.clearTimeout(copiedTimer.current), [])
+
+  // 定位失败反馈：DOM 找不到对应正文时短暂提示"暂不可定位"（dom-anchor 承诺的兜底 UI）
+  const [unlocatable, setUnlocatable] = useState(false)
+  const unlocatableTimer = useRef(0)
+  useEffect(() => () => window.clearTimeout(unlocatableTimer.current), [])
 
   const onCopy = (): void => {
     if (state === undefined) return
@@ -336,6 +346,11 @@ export function OutlinePanel(props: OutlinePanelProps) {
           {t('action.scrollBottom')}
         </button>
       </div>
+      {unlocatable && (
+        <div className={css.toast} role="status">
+          {t('action.unlocatable')}
+        </div>
+      )}
     </div>
   ) : null
 
