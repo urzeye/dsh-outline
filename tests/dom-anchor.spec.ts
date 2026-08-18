@@ -25,6 +25,22 @@ function setupDom(): HTMLElement {
   return root
 }
 
+/** 插队（steering）夹在两轮 user 之间：ChatView 把它标成 data-chat-flow-kind=steering。 */
+function setupSteeringDom(): HTMLElement {
+  document.body.innerHTML = `
+    <div data-slot="conversation">
+      <div data-chat-flow-kind="user">如何配置 nginx？</div>
+      <div data-chat-flow-kind="assistant-step"><h1>结论</h1></div>
+      <div data-chat-flow-kind="steering">请给我3个三级标题</div>
+      <div data-chat-flow-kind="assistant-step"><h3>标题一</h3></div>
+      <div data-chat-flow-kind="user">之后的正常问题</div>
+      <div data-chat-flow-kind="assistant-step"><h2>补充</h2></div>
+    </div>`
+  const root = findChatRoot()
+  if (root === null) throw new Error('chat root not found')
+  return root
+}
+
 describe('dom-anchor', () => {
   it('collects user rows in document order', () => {
     const root = setupDom()
@@ -43,9 +59,47 @@ describe('dom-anchor', () => {
     const root = setupDom()
     const hit = locateItem(root, node({ isUserQuery: true, userIndex: 1, level: 0, text: '第二个问题' }))
     expect(hit?.textContent).toBe('第二个问题')
-    // 文本不匹配（虚拟列表错位等）→ null，绝不错位滚动
+    // 文本在 DOM 中不存在 → null，绝不错位滚动
     expect(locateItem(root, node({ isUserQuery: true, userIndex: 1, level: 0, text: '不相干的问题' }))).toBeNull()
     expect(locateItem(root, node({ isUserQuery: true, userIndex: 9, level: 0, text: '越界' }))).toBeNull()
+  })
+
+  it('collects steering rows with user rows in document order', () => {
+    const root = setupSteeringDom()
+    const rows = collectUserRows(root)
+    expect(rows.map((el) => el.textContent)).toEqual([
+      '如何配置 nginx？',
+      '请给我3个三级标题',
+      '之后的正常问题',
+    ])
+  })
+
+  it('locates a steering item and the user messages after it', () => {
+    const root = setupSteeringDom()
+    const steering = locateItem(root, node({
+      isUserQuery: true, userIndex: 1, level: 0, text: '请给我3个三级标题',
+    }))
+    expect(steering?.getAttribute('data-chat-flow-kind')).toBe('steering')
+    expect(steering?.textContent).toBe('请给我3个三级标题')
+
+    const after = locateItem(root, node({
+      isUserQuery: true, userIndex: 2, level: 0, text: '之后的正常问题',
+    }))
+    expect(after?.getAttribute('data-chat-flow-kind')).toBe('user')
+    expect(after?.textContent).toBe('之后的正常问题')
+  })
+
+  it('falls back to text match when a userIndex is shifted by steering rows', () => {
+    const root = setupSteeringDom()
+    // 旧逻辑只收集 kind=user，userIndex=1 会错落到「之后的正常问题」
+    const hit = locateItem(root, node({
+      isUserQuery: true, userIndex: 1, level: 0, text: '请给我3个三级标题',
+    }))
+    expect(hit?.textContent).toBe('请给我3个三级标题')
+    const after = locateItem(root, node({
+      isUserQuery: true, userIndex: 0, level: 0, text: '之后的正常问题',
+    }))
+    expect(after?.textContent).toBe('之后的正常问题')
   })
 
   it('locates headings by index, falls back to text match on mismatch', () => {
