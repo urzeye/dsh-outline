@@ -5,8 +5,9 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  /* 固定高度：大纲随流式增长时面板不弹跳，peek/pin 都是稳定目标 */
-  height: min(560px, calc(100vh - 200px));
+  /* 固定高度：大纲随流式增长时面板不弹跳，peek/pin 都是稳定目标。
+     75vh 让长会话能一次看到更多节点；短屏再被底边 80px 余量卡住。 */
+  height: min(75vh, calc(100vh - 80px));
   pointer-events: auto;
   background: var(--dsw-alias-bg-layer-1, #fff);
   border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.08));

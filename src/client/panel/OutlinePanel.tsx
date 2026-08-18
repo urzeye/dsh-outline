@@ -217,7 +217,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
 
   const panelStyle = chrome.left !== null && chrome.top !== null
     ? { width: PANEL_WIDTH, left: chrome.left, top: chrome.top }
-    : { width: PANEL_WIDTH, right: 30, top: '30%' }
+    : { width: PANEL_WIDTH, right: 30, top: '12.5%' }
 
   const panelNode = visible ? (
     <div
