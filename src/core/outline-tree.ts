@@ -161,6 +161,37 @@ export function revealPath(nodes: OutlineNode[], targetIndex: number): boolean {
   return mark(nodes, [])
 }
 
+/** 从根到目标的祖先链（含自身）；找不到返回 null。 */
+function findPath(nodes: readonly OutlineNode[], id: string): OutlineNode[] | null {
+  for (const node of nodes) {
+    if (node.id === id) return [node]
+    const nested = findPath(node.children, id)
+    if (nested !== null) return [node, ...nested]
+  }
+  return null
+}
+
+/**
+ * 阅读高亮落到面板可见行：锚点本身可见则用它，否则收到最近的可见祖先。
+ * 展开档位挡住子孙标题时，仍能亮起当前能看见的那一层。
+ */
+export function resolveVisibleActiveId(
+  activeId: string | null,
+  tree: readonly OutlineNode[],
+  visible: readonly OutlineNode[],
+): string | null {
+  if (activeId === null) return null
+  const visibleIds = new Set(visible.map((node) => node.id))
+  if (visibleIds.has(activeId)) return activeId
+  const path = findPath(tree, activeId)
+  if (path === null) return null
+  for (let i = path.length - 1; i >= 0; i--) {
+    const id = path[i]?.id
+    if (id !== undefined && visibleIds.has(id)) return id
+  }
+  return null
+}
+
 /** 清除全部 forceVisible 标记，并按 expandLevel 恢复被揭示路径临时改过的折叠态。 */
 export function clearForceVisible(nodes: OutlineNode[], displayLevel: number): void {
   for (const node of nodes) {

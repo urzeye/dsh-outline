@@ -10,8 +10,10 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useSyncE
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ISessions } from '@deepseek-ai/dsh-client-runtime/client'
 import { OutlineManager } from '../../core/outline-manager.ts'
+import { resolveVisibleActiveId } from '../../core/outline-tree.ts'
 import type { OutlineNode } from '../../core/types.ts'
 import { buildOutlineItems } from '../outline-source.ts'
+import { ensureElementInView } from '../../core/scroll-utils.ts'
 import {
   computeActiveItemId, findChatRoot, scrollChatToBottom, scrollChatToTop, scrollToItem,
 } from '../dom-anchor.ts'
@@ -95,6 +97,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
 
   // 阅读位置追踪（捕获阶段监听 chatRoot，覆盖滚动容器替换；rAF 节流）
   const activeIdRef = useRef<string | null>(null)
+  const listRef = useRef<HTMLDivElement | null>(null)
   const [, bumpActive] = useReducer((x: number) => x + 1, 0)
   useEffect(() => {
     if (!visible || state === undefined) return
@@ -108,15 +111,23 @@ export function OutlinePanel(props: OutlinePanelProps) {
       }
     }
     collect(state.tree)
+    const followActive = (id: string | null): void => {
+      const list = listRef.current
+      if (id === null || list === null) return
+      const row = list.querySelector(`[data-dsho-id="${CSS.escape(id)}"]`)
+      if (row instanceof HTMLElement) ensureElementInView(row, list)
+    }
     let raf = 0
     const onScroll = (): void => {
       if (raf !== 0) return
       raf = window.requestAnimationFrame(() => {
         raf = 0
-        const id = computeActiveItemId(root, flat)
+        const rawId = computeActiveItemId(root, flat)
+        const id = resolveVisibleActiveId(rawId, state.tree, state.visible)
         if (id !== activeIdRef.current) {
           activeIdRef.current = id
           bumpActive()
+          followActive(id)
         }
       })
     }
@@ -300,7 +311,7 @@ export function OutlinePanel(props: OutlinePanelProps) {
         onChange={(level) => manager?.setLevel(level)}
         t={t}
       />
-      <div className={css.list}>
+      <div className={css.list} ref={listRef}>
         {state === undefined || state.visible.length === 0 ? (
           <div className={css.empty}>
             <span className={css.emptyGlyph}><OutlineGlyph /></span>

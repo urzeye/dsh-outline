@@ -54,6 +54,7 @@ export function OutlineRow(props: {
       className={`${css.item} ${active ? css.itemActive : ''} ${node.isUserQuery === true ? css.itemUser : ''}`}
       style={{ paddingLeft: 8 + node.level * 14 }}
       data-level={node.level}
+      data-dsho-id={node.id}
       role="button"
       tabIndex={0}
       onClick={() => onClick(node)}

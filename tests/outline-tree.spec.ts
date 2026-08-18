@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildTree, captureCollapseState, clearForceExpandedState, flattenVisible,
   maxActualLevel, computeLevelCounts, markBookmarkedPaths, restoreCollapseState,
-  revealPath, clearForceVisible,
+  revealPath, clearForceVisible, resolveVisibleActiveId,
 } from '../src/core/outline-tree.ts'
 import type { OutlineItem, OutlineNode } from '../src/core/types.ts'
 
@@ -146,6 +146,49 @@ describe('revealPath / clearForceVisible', () => {
     clearForceVisible(tree, 0)
     visible = flattenVisible(tree, { expandLevel: 0, searching: false, bookmarkMode: false })
     expect(texts(visible)).toEqual(['问题一', '问题二'])
+  })
+})
+
+describe('resolveVisibleActiveId', () => {
+  const flattenOpts = { expandLevel: 2, searching: false, bookmarkMode: false } as const
+
+  it('keeps the active id when that row is already visible', () => {
+    const tree = buildTree(sampleItems())
+    clearForceExpandedState(tree, 2)
+    const visible = flattenVisible(tree, flattenOpts)
+    const h2 = tree[0]?.children[0]
+    if (h2 === undefined) throw new Error('missing h2')
+    expect(resolveVisibleActiveId(h2.id, tree, visible)).toBe(h2.id)
+  })
+
+  it('lifts a hidden descendant to the nearest visible ancestor', () => {
+    const tree = buildTree(sampleItems())
+    clearForceExpandedState(tree, 2)
+    const visible = flattenVisible(tree, flattenOpts)
+    const h3 = tree[0]?.children[0]?.children[0]
+    const h2 = tree[0]?.children[0]
+    if (h3 === undefined || h2 === undefined) throw new Error('missing')
+    expect(texts(visible)).not.toContain('细节a')
+    expect(resolveVisibleActiveId(h3.id, tree, visible)).toBe(h2.id)
+  })
+
+  it('lifts to the user question when only level 0 is expanded', () => {
+    const tree = buildTree(sampleItems())
+    clearForceExpandedState(tree, 0)
+    const visible = flattenVisible(tree, { expandLevel: 0, searching: false, bookmarkMode: false })
+    const h3 = tree[0]?.children[0]?.children[0]
+    const q1 = tree[0]
+    if (h3 === undefined || q1 === undefined) throw new Error('missing')
+    expect(resolveVisibleActiveId(h3.id, tree, visible)).toBe(q1.id)
+  })
+
+  it('returns null when no ancestor is in the visible set', () => {
+    const tree = buildTree(sampleItems())
+    const h3 = tree[0]?.children[0]?.children[0]
+    if (h3 === undefined) throw new Error('missing h3')
+    expect(resolveVisibleActiveId(h3.id, tree, [])).toBeNull()
+    expect(resolveVisibleActiveId(null, tree, [])).toBeNull()
+    expect(resolveVisibleActiveId('missing', tree, flattenVisible(tree, flattenOpts))).toBeNull()
   })
 })
 
