@@ -62,11 +62,43 @@ dsh plugin --profile web add ./dsh-outline-0.1.3.tgz
 
 ### 本地路径安装（开发调试）
 
+先在本仓库构建，再把本地路径 link 进 DSH 的 web profile：
+
 ```sh
+cd /path/to/dsh-outline
+pnpm install
+pnpm build
+```
+
+若先前装过 npm 上的 `dsh-outline`，先卸掉，避免仍在跑旧包：
+
+```sh
+dsh plugin --profile web remove dsh-outline
 dsh plugin --profile web add /path/to/dsh-outline   # 或相对路径 ./dsh-outline
 ```
 
-link 安装后 client 改动经 `pnpm watch` 重建即可 HMR 生效；host 半变更需重启 `dsh web`。
+第一次安装（以及任何 host 半变更）后需重启 `dsh web`。打开任意会话页，悬停右缘大纲触发条，确认面板出现。
+
+之后改 `src/client/**` 时另开终端盯构建即可，**不必重启** `dsh web`：
+
+```sh
+cd /path/to/dsh-outline
+pnpm watch
+```
+
+保存后 tsdown 重写 `lib/client.js`，DSH client HMR 会自动刷新。
+
+| 改动 | 要不要重启 `dsh web` |
+| --- | --- |
+| `src/client/**`（面板、定位、抽取） | 否，`pnpm watch` + HMR |
+| `src/index.ts` / host 半、`cordis.patch.yml`、`dsh.plugin.json` | 要 |
+| 第一次 `dsh plugin add` | 要 |
+
+常见问题：
+
+- 命令必须带 `--profile web`，否则加不到 Web GUI 那套 profile。
+- 面板不出现：看 `dsh web` 终端有没有插件加载报错；确认装的是本地路径而不是 npm 旧版。
+- 改了代码页面没变：看 `pnpm watch` 有没有写出 `lib/client.js`，必要时浏览器强刷一次。
 
 ### 卸载
 
@@ -82,6 +114,8 @@ dsh plugin --profile web remove dsh-outline
 4. 面板内：点击节点跳转正文；顶部滑块调整展开层级；节点行内提供展开/收起与收藏按钮；支持关键词搜索。
 
 ## 开发
+
+把本仓库 link 进 DSH、HMR 与何时重启，见上文「本地路径安装（开发调试）」。
 
 ```sh
 pnpm install       # 安装依赖（prepare 会自动构建 lib/）
