@@ -21,8 +21,8 @@ import {
   loadBookmarks, loadExpandLevel, saveBookmarks, saveExpandLevel, type ChromeStore,
 } from '../store.ts'
 import {
-  CheckGlyph, CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, LevelSlider, OutlineGlyph,
-  OutlineRow, PinGlyph, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
+  CheckGlyph, CloseGlyph, CollapseAllGlyph, CopyGlyph, ExpandAllGlyph, GitHubGlyph, LevelSlider,
+  OutlineGlyph, OutlineRow, PinGlyph, ScrollBottomGlyph, ScrollTopGlyph, SearchGlyph, StarGlyph,
 } from './parts.tsx'
 import css from './panel.module.css'
 
@@ -35,6 +35,7 @@ export type OutlinePanelProps =
   PropsRuntime<'shell.overlay'> & InjectFace<OutlineInjected> & PropsLocale<'outline'>
 
 const PANEL_WIDTH = 320
+const REPO_URL = 'https://github.com/urzeye/dsh-outline'
 
 export function OutlinePanel(props: OutlinePanelProps) {
   const { store, sessions, useSessions, t } = props
@@ -231,6 +232,17 @@ export function OutlinePanel(props: OutlinePanelProps) {
       <div className={css.header} onPointerDown={onDragStart}>
         <span className={css.headerGlyph}><OutlineGlyph /></span>
         <span className={css.title}>{t('panel.title')}</span>
+        <a
+          className={css.iconBtn}
+          href={REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={t('panel.github')}
+          aria-label={t('panel.github')}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <GitHubGlyph />
+        </a>
         <button
           type="button"
           className={chrome.pinned ? `${css.iconBtn} ${css.iconBtnActive}` : css.iconBtn}

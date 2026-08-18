@@ -69,6 +69,7 @@
   background: none;
   color: var(--dsw-alias-label-tertiary, #65666b);
   cursor: pointer;
+  text-decoration: none;
   transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 
