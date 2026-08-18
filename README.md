@@ -48,8 +48,10 @@
 ### 从 npm 安装（推荐）
 
 ```sh
-dsh plugin --profile web add dsh-outline
+dsh plugin --profile web add dsh-outline@latest
 ```
+
+已经装过时请带 `@latest`：裸包名会沿用 lockfile 里的旧版本，不会自动升级。
 
 ### 从 tarball 安装
 

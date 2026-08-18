@@ -63,7 +63,7 @@ jobs:
           **安装（npm，推荐）**：
 
           \`\`\`sh
-          dsh plugin --profile web add dsh-outline
+          dsh plugin --profile web add dsh-outline@latest
           \`\`\`
 
           **tarball**：下载下方 Assets 中的 \`dsh-outline-${VERSION}.tgz\`：
