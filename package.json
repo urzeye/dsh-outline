@@ -1,6 +1,6 @@
 {
   "name": "dsh-outline",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "DSH web plugin: a realtime conversation outline panel (user questions + markdown headings) for the DeepSeek Harness Web GUI.",
   "type": "module",
   "license": "MIT",
