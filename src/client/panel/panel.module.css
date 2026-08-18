@@ -145,6 +145,14 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* type=search 自带清除钮，和自定义 searchClear 叠成两个 × */
+.search::-webkit-search-cancel-button,
+.search::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 .search::placeholder {
   color: var(--dsw-alias-label-caption, #adb2b8);
 }
